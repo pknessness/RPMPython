@@ -1,0 +1,44 @@
+<html>
+  <style>
+    body {
+       background-color: rgb(192,192,192);
+    }
+  </style>
+    <head>
+    <!-- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> -->
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="static/stylesheet.css" />
+    <link rel="icon" href="VirtualLabLogo.png">
+  </head>
+  <title>Centrifuge Control Interface</title>
+  <body>
+    <div class="title-bar">
+      <div class="title-bar-text">
+          Centrifuge Control Interface
+      </div>
+      <div class="title-bar-controls">
+        <button aria-label="Help" onclick="alert('MOPED MOTOR CONTROLLER')"></button>
+      </div>
+    </div>
+    <div class="parent" id="parent_layout">
+      <div class="div2" id="tab_div">
+        <menu role="tablist">
+          <li role="tab" aria-selected="true" id="icon_tab"><a href="#tabs">Icon</a></li>
+          <li role="tab" id="zoom_tab"><a href="#tabs">Zoom Frame</a></li>
+          <li role="tab" disabled="true" id="data_panel_tab"><a href="#tabs">Data Panel</a></li>
+        </menu>
+        <div class="window" role="tabpanel" id="tab_window">
+          <div class="window-body" id="tab_window_body">
+            <div id="side_box"  class="zoom-frame">
+              <canvas id="side_canvas" class="zoom-frame"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="div3" id="video_div">
+        <canvas id="graph_canvas" class="zoom-frame"></canvas>
+      </div>
+    </div>
+    <script src = "static/index.js"></script> 
+  </body>
+</html>
