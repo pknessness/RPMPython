@@ -30,7 +30,14 @@
         <div class="window" role="tabpanel" id="tab_window">
           <div class="window-body" id="tab_window_body">
             <div id="side_box"  class="zoom-frame">
-              <canvas id="side_canvas" class="zoom-frame"></canvas>
+              <textarea id="input_profile" class="input-area" spellcheck="false" onchange="updateChart()">
+0MS, 0G
+2300MS, 4G
+2600MS, 5G
+3000MS, 2G
+7000MS, 8G
+8000MS, 1G
+9000MS, 0G</textarea>
             </div>
           </div>
         </div>
@@ -39,6 +46,7 @@
         <canvas id="graph_canvas" class="zoom-frame"></canvas>
       </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src = "static/index.js"></script> 
   </body>
 </html>

@@ -1,73 +1,60 @@
-const canvas = document.getElementById('graph_canvas');
-const context = canvas.getContext('2d');
 
-var nodes = [];
+const ctx = document.getElementById('graph_canvas');
 
+const data = {
+  datasets: [{
+    label: 'Gravity',
+    data: [],
+    fill: false,
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0.1
+  }]
+};
 
-function draw() {
-    context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    for (let i = 0; i < nodes.length; i++) {
-        let node = nodes[i];
-        context.beginPath();
-        context.fillStyle = node.fillStyle;
-        context.arc(node.x, node.y, node.radius, 0, Math.PI * 2, true);
-        context.strokeStyle = node.strokeStyle;
-        context.fill();
-        context.stroke();
+const config = {
+  type: 'line',
+  data: data,
+  responsive: true,
+  maintainAspectRatio: false,
+  options: {
+        scales: {
+            y: {
+                ticks: {
+                    // Include a dollar sign in the ticks
+                    callback: function(value, index, ticks) {
+                        return `${value}G`;
+                    }
+                }
+            },
+            x: {
+                ticks: {
+                    // Include a dollar sign in the ticks
+                    callback: function(value, index, ticks) {
+                        return `${value}ms`;
+                    }
+                }
+            }
+        }
     }
+};
+
+var myChart = new Chart(ctx, config);
+
+function updateChart(){
+	var textIn = document.getElementById("input_profile");
+	var lines = textIn.value.replaceAll(" ","").split("\n");
+	myChart.data.datasets[0].data = []
+	for(var i = 0; i < lines.length; i ++){
+		console.log(`lines ${lines[i]}`);
+		var split = lines[i].split(",");
+		console.log(split);
+		if(!split[0].endsWith("MS") | !split[1].endsWith("G")) break;
+		var ms = split[0].split("MS")[0];
+		var g = split[1].split("G")[0];
+		myChart.data.datasets[0].data.push({x: ms, y: g});
+	}
+	myChart.update()
 }
 
-var selection = undefined;
-
-function within(x, y) {
-    return nodes.find(n => {
-        return x > (n.x - n.radius) && 
-            y > (n.y - n.radius) &&
-            x < (n.x + n.radius) &&
-            y < (n.y + n.radius);
-    });
-}
-
-/** remove the onclick code and update move and up code */
-function move(e) {
-    if (selection) {
-        selection.x = e.x;
-        selection.y = e.y;
-        selection.moving = true;
-        draw();
-    }
-    console.log(selection.x);
-}
-
-function down(e) {
-    let target = within(e.x, e.y);
-    if (target) {
-        selection = target;
-    }
-}
-
-function up(e) {
-    if (!selection || !selection.moving) {
-        let node = {
-            x: e.x,
-            y: e.y,
-            radius: 10,
-            fillStyle: '#22cccc',
-            strokeStyle: '#009999',
-            selectedFill: '#88aaaa'
-        };
-        nodes.push(node);
-        draw();
-        console.log("pushed",node);
-    }
-    if (selection) {
-        delete selection.moving;
-        delete selection.selected;
-    }
-    selection = undefined;
-    draw();
-}
-
-window.onmousemove = move;
-window.onmousedown = down;
-window.onmouseup = up;
+console.log(myChart);
+updateChart();
