@@ -1,5 +1,11 @@
 
 const ctx = document.getElementById('graph_canvas');
+const textIn = document.getElementById("input_profile");
+const controlPanel = document.getElementById("control_panel");
+
+const tabInput = document.getElementById("input_tab");
+const tabControlPanel = document.getElementById("control_tab");
+
 
 const data = {
   datasets: [{
@@ -20,15 +26,14 @@ const config = {
         scales: {
             y: {
                 ticks: {
-                    // Include a dollar sign in the ticks
                     callback: function(value, index, ticks) {
                         return `${value}G`;
                     }
                 }
             },
             x: {
+				type: 'linear',
                 ticks: {
-                    // Include a dollar sign in the ticks
                     callback: function(value, index, ticks) {
                         return `${value}ms`;
                     }
@@ -41,7 +46,6 @@ const config = {
 var myChart = new Chart(ctx, config);
 
 function updateChart(){
-	var textIn = document.getElementById("input_profile");
 	var lines = textIn.value.replaceAll(" ","").split("\n");
 	myChart.data.datasets[0].data = []
 	for(var i = 0; i < lines.length; i ++){
@@ -51,10 +55,79 @@ function updateChart(){
 		if(!split[0].endsWith("MS") | !split[1].endsWith("G")) break;
 		var ms = split[0].split("MS")[0];
 		var g = split[1].split("G")[0];
+		console.log("AAA",ms,g);
 		myChart.data.datasets[0].data.push({x: ms, y: g});
 	}
 	myChart.update()
 }
-
-console.log(myChart);
 updateChart();
+
+function inputTab(){
+	textIn.hidden = false;
+	controlPanel.hidden = true;
+	tabInput.setAttribute('aria-selected','true');
+	tabControlPanel.setAttribute('aria-selected','false');
+}
+function controlPanelTab(){
+	textIn.hidden = true;
+	controlPanel.hidden = false;
+	tabInput.setAttribute('aria-selected','false');
+	tabControlPanel.setAttribute('aria-selected','true');
+}
+
+controlPanelTab();
+
+function start(){
+	fetch("/commands", {
+	  method: "post",
+	  headers: {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json'
+	  },
+	  //make sure to serialize your JSON body
+	  body: JSON.stringify({
+		command: "START",
+		password: "SOMETHING"
+	  })
+	})
+	.then(response => response.json()).then(data =>{
+		console.log(data);
+	});
+}
+
+function upload(){
+	fetch("/commands", {
+	  method: "post",
+	  headers: {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json'
+	  },
+	  //make sure to serialize your JSON body
+	  body: JSON.stringify({
+		command: "UPLOAD",
+		password: "SOMETHING",
+		data: textIn.value.replaceAll(" ","")	
+	  })
+	})
+	.then(response => response.json()).then(data =>{
+		console.log(data);
+	});
+}
+
+function stop(){
+	fetch("/commands", {
+	  method: "post",
+	  headers: {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json'
+	  },
+	  //make sure to serialize your JSON body
+	  body: JSON.stringify({
+		command: "STOP",
+		password: "SOMETHING"
+	  })
+	})
+	.then(response => response.json()).then(data =>{
+		console.log(data);
+	});
+}

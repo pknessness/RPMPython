@@ -23,9 +23,9 @@
     <div class="parent" id="parent_layout">
       <div class="div2" id="tab_div">
         <menu role="tablist">
-          <li role="tab" aria-selected="true" id="icon_tab"><a href="#tabs">Icon</a></li>
-          <li role="tab" id="zoom_tab"><a href="#tabs">Zoom Frame</a></li>
-          <li role="tab" disabled="true" id="data_panel_tab"><a href="#tabs">Data Panel</a></li>
+          <li role="tab" aria-selected="true" id="input_tab"><a href="#input" onclick="inputTab();">Input Profile</a></li>
+          <li role="tab" id="control_tab"><a href="#control_panel" onclick="controlPanelTab();">Control Panel</a></li>
+          <!--<li role="tab" disabled="true" id="data_panel_tab"><a href="#tabs">Data Panel</a></li>-->
         </menu>
         <div class="window" role="tabpanel" id="tab_window">
           <div class="window-body" id="tab_window_body">
@@ -38,6 +38,17 @@
 7000MS, 8G
 8000MS, 1G
 9000MS, 0G</textarea>
+              <div id="control_panel">
+                <button class="startButton" onclick="start();">
+                  START
+                </button>
+                <button class="stopButton" onclick="upload();">
+                  UPLOAD
+                </button>
+                <button class="stopButton" onclick="stop();">
+                  STOP
+                </button>
+              </div>
             </div>
           </div>
         </div>
