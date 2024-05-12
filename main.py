@@ -9,7 +9,7 @@ import serial.tools.list_ports
 import serial
 import time
 
-termiosBullshit = 0
+termiosBullshit = 1
 
 if(termiosBullshit):
     import termios
@@ -54,7 +54,7 @@ def scan():
     return ports
     
 def serialInit(block = None):
-    ser = serial.Serial()
+    ser = serial.Serial(dsrdtr=None)
     #ser.port = "/dev/"+ port
     
     ser.baudrate = 115200
@@ -68,10 +68,10 @@ def serialInit(block = None):
     ser.timeout = block
     
     ser.xonxoff = False     #disable software flow control
-    ser.rtscts = None     #disable hardware (RTS/CTS) flow control
+    ser.rtscts = False     #disable hardware (RTS/CTS) flow control
     ser.dsrdtr = None       #disable hardware (DSR/DTR) flow control
     
-    #ser.setDTR(False)
+    ser.setDTR(False)
     
     #ser.writeTimeout = 2     #timeout for write
     try:
@@ -115,11 +115,20 @@ def start():
     if(isinstance(response,Exception)): return response;
     return response;
 
-def upload():
-    return "UNKNOWN"
+def upload(data):
+    #response = writeRead("UPLOAD;");
+    #if(isinstance(response,Exception)): return response;
+    response = writeRead("UPLOAD; "+ data + ';');
+    if(isinstance(response,Exception)): return response;
+    return response;
 
 def stop(): 
     response = writeRead("STOP;");
+    if(isinstance(response,Exception)): return response;
+    return response;
+    
+def request_data(): 
+    response = writeRead("REQUEST_DATA;");
     if(isinstance(response,Exception)): return response;
     return response;
 
@@ -133,7 +142,7 @@ async def commands(info: Request):
             "status": str(status)
         })
     if(data['command'] == "UPLOAD"):
-        status = upload();
+        status = upload(data['data']);
         return JSONResponse({
             "command": "UPLOAD",
             "status": str(status)
@@ -142,6 +151,12 @@ async def commands(info: Request):
         status = stop();
         return JSONResponse({
             "command": "STOP",
+            "status": str(status)
+        })
+    if(data['command'] == "REQUEST_DATA"):
+        status = request_data();
+        return JSONResponse({
+            "command": "REQUEST_DATA",
             "status": str(status)
         })
             
