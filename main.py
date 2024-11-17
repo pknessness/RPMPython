@@ -1,33 +1,23 @@
 #!env/bin/python
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi import Request
-import uvicorn
 from datetime import datetime, timezone
-import serial.tools.list_ports
+#import serial.tools.list_ports
 import serial
 import time
 
-termiosBullshit = 1
+# termiosBullshit = 1
 
-if(termiosBullshit):
-    import termios
+# if(termiosBullshit):
+#     import termios
 
-    port = '/dev/ttyACM0'
-    f = open(port)
-    attrs = termios.tcgetattr(f)
-    attrs[2] = attrs[2] & ~termios.HUPCL
-    termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
-    f.close()
-
-app = FastAPI()
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
+#     port = '/dev/ttyACM0'
+#     f = open(port)
+#     attrs = termios.tcgetattr(f)
+#     attrs[2] = attrs[2] & ~termios.HUPCL
+#     termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
+#     f.close()
 
 ports = []
 
-@app.get("/")
 def get_root():
     text_file = open("index.html", "r")
  
@@ -36,9 +26,8 @@ def get_root():
     
     #close file
     text_file.close()
-    return HTMLResponse(data,status_code=200)
+    #return HTMLResponse(data,status_code=200)
     
-@app.get("/scan")
 def scan():
     global ports
     ports = []
@@ -132,40 +121,50 @@ def request_data():
     if(isinstance(response,Exception)): return response;
     return response;
 
-@app.post("/commands")
-async def commands(info: Request):
-    data = await info.json()
-    if(data['command'] == "START"):
-        status = start();
-        return JSONResponse({
-            "command": "START",
-            "status": str(status)
-        })
-    if(data['command'] == "UPLOAD"):
-        status = upload(data['data']);
-        return JSONResponse({
-            "command": "UPLOAD",
-            "status": str(status)
-        })
-    if(data['command'] == "STOP"):
-        status = stop();
-        return JSONResponse({
-            "command": "STOP",
-            "status": str(status)
-        })
-    if(data['command'] == "REQUEST_DATA"):
-        status = request_data();
-        return JSONResponse({
-            "command": "REQUEST_DATA",
-            "status": str(status)
-        })
+# async def commands(info: Request):
+#     data = await info.json()
+#     if(data['command'] == "START"):
+#         status = start();
+#         return JSONResponse({
+#             "command": "START",
+#             "status": str(status)
+#         })
+#     if(data['command'] == "UPLOAD"):
+#         status = upload(data['data']);
+#         return JSONResponse({
+#             "command": "UPLOAD",
+#             "status": str(status)
+#         })
+#     if(data['command'] == "STOP"):
+#         status = stop();
+#         return JSONResponse({
+#             "command": "STOP",
+#             "status": str(status)
+#         })
+#     if(data['command'] == "REQUEST_DATA"):
+#         status = request_data();
+#         return JSONResponse({
+#             "command": "REQUEST_DATA",
+#             "status": str(status)
+#         })
             
         
-    return JSONResponse({
-        "command": "UNKNOWN",
-        "status": "UNKNOWN"
-    })
+#     return JSONResponse({
+#         "command": "UNKNOWN",
+#         "status": "UNKNOWN"
+#     })
     
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    #uvicorn.run(app, host="127.0.0.1", port=8000)
+    from PyQt6.QtWidgets import *
+    app = QApplication([])
+    window = QWidget()
+    layout = QVBoxLayout()
+    layout.addWidget(QPushButton('Top'))
+    layout.addWidget(QPushButton('Bottom'))
+    window.setLayout(layout)
+    window.show()
+    app.exec()
+
+
