@@ -69,9 +69,9 @@ def serialInit(block = None):
         scan()
     try:
         for port in ports:
-            if(port['device'] == 'NA'):
+            if(0 and port['device'] == 'NA'):
                 continue
-            if(0 and platform.system() == "Windows"):
+            if(platform.system() == "Windows"):
                 ser.port = port['port']
             else:
                 ser.port = "/dev/"+ port['port']
@@ -81,9 +81,9 @@ def serialInit(block = None):
         scan()
         try:
             for port in ports:
-                if(port['device'] == 'NA'):
+                if(0 and port['device'] == 'NA'):
                     continue
-                if(0 and platform.system() == "Windows"):
+                if(platform.system() == "Windows"):
                     ser.port = port['port']
                 else:
                     ser.port = "/dev/"+ port['port']
