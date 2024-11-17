@@ -145,6 +145,7 @@ def start():
     return response
 
 def stop(): 
+    status = 0
     response = writeRead("r")
     filename = "NO_PROFILE"
     if(isinstance(response,Exception)): return response
