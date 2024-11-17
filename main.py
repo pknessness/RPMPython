@@ -27,7 +27,7 @@ def newFile():
     global filename
     now = datetime.now()
     filename = "logs/log_"+now.strftime("%d-%m-%Y_%H_%M_%S")
-    f = open(filename + ".csv", "w+").close()
+    #f = open(filename + ".csv", "w+").close()
     
 def writeFile(text):
     f = open(filename + ".csv", "a")
@@ -158,7 +158,10 @@ def request_data():
     else:
         text = response.replace("+","").replace("#","").replace("==","=")
         values = text.split("=")
-        writeFile(f"{values[0]},{values[1]},{values[2]},{values[3]},{values[4]},{datetime.utcnow()}\n")
+        try:
+            writeFile(f"{values[0]},{values[1]},{values[2]},{values[3]},{values[4]},{datetime.utcnow()}\n")
+        except:
+            print(text, "is a wierd output")
     return response
 
 # async def commands(info: Request):
