@@ -3,9 +3,8 @@ from datetime import datetime, timezone
 import serial.tools.list_ports
 from PyQt6.QtWidgets import *
 import serial
-import time
-import platform
-
+import time, platform, threading
+from datetime import datetime, timezone
 # termiosBullshit = 1
 
 # if(termiosBullshit):
@@ -19,6 +18,20 @@ import platform
 #     f.close()
 
 ports = []
+
+status = 0
+
+filename = "NO_PROFILE"
+
+def newFile():
+    global filename
+    now = datetime.now()
+    filename = "logs/log_"+now.strftime("%d-%m-%Y_%H_%M_%S")
+    #f = open(filename + ".csv", "w").close()
+    
+def writeFile(text):
+    f = open(filename + ".csv", "a")
+    f.write(text)
 
 def get_root():
     text_file = open("index.html", "r")
@@ -36,7 +49,7 @@ def scan():
     for port in serial.tools.list_ports.comports():
         
         try:
-            s = serial.Serial(port.name);
+            s = serial.Serial(port.name)
             ports.append({"port": port.name, "device" : s.portstr})
         except:
             ports.append({"port": port.name, "device" : "NA"})
@@ -69,37 +82,37 @@ def serialInit(block = None):
         scan()
     try:
         for port in ports:
-            if(0 and port['device'] == 'NA'):
+            if(platform.system() == "Windows" and port['device'] == 'NA'):
                 continue
             if(platform.system() == "Windows"):
                 ser.port = port['port']
             else:
                 ser.port = "/dev/"+ port['port']
-            print("initalized ser",ser)
+            #print("initalized ser",ser)
             ser.open()
     except:
         scan()
         try:
             for port in ports:
-                if(0 and port['device'] == 'NA'):
+                if(platform.system() == "Windows" and port['device'] == 'NA'):
                     continue
                 if(platform.system() == "Windows"):
                     ser.port = port['port']
                 else:
                     ser.port = "/dev/"+ port['port']
-                print("initalized ser",ser)
+                #print("initalized ser",ser)
                 ser.open()
         except Exception as e:
             
             return e
-    return ser;
+    return ser
     
 def writeRead(writeString):
     ser = serialInit(1)
     
     response = None
     
-    if(isinstance(ser,Exception)): return ser;
+    if(isinstance(ser,Exception)): return ser
     
     try:
         print(f"Attempting write {writeString} from Arduino {ser}:")
@@ -119,45 +132,57 @@ def writeRead(writeString):
     return response
     
 def start(): 
-    response = writeRead("START;");
-    return response
-
-def upload(data):
-    #response = writeRead("UPLOAD;");
-    #if(isinstance(response,Exception)): return response;
-    response = writeRead("UPLOAD; "+ data + ';');
+    global status
+    if(status == 0):
+        threading.Timer(0.1, request_data).start()
+    else:
+        return
+    status = 1
+    response = writeRead("a")
+    newFile()
+    writeFile("accel_x,accel_y,accel_z,encoder_a,encoder_b, t\n")
+    if(isinstance(response,Exception)): return response
     return response
 
 def stop(): 
-    response = writeRead("STOP;")
+    response = writeRead("r")
+    filename = "NO_PROFILE"
+    if(isinstance(response,Exception)): return response
     return response
     
 def request_data(): 
-    response = writeRead("REQUEST_DATA;")
+    response = writeRead("d")
+    if(isinstance(response,Exception)):
+        writeFile(str(response)+"\n")
+        return response
+    else:
+        text = response.replace("+","").replace("#","").replace("==","=")
+        values = text.split("=")
+        writeFile(f"{values[0]},{values[1]},{values[2]},{values[3]},{values[4]},{datetime.utcnow()}\n")
     return response
 
 # async def commands(info: Request):
 #     data = await info.json()
 #     if(data['command'] == "START"):
-#         status = start();
+#         status = start()
 #         return JSONResponse({
 #             "command": "START",
 #             "status": str(status)
 #         })
 #     if(data['command'] == "UPLOAD"):
-#         status = upload(data['data']);
+#         status = upload(data['data'])
 #         return JSONResponse({
 #             "command": "UPLOAD",
 #             "status": str(status)
 #         })
 #     if(data['command'] == "STOP"):
-#         status = stop();
+#         status = stop()
 #         return JSONResponse({
 #             "command": "STOP",
 #             "status": str(status)
 #         })
 #     if(data['command'] == "REQUEST_DATA"):
-#         status = request_data();
+#         status = request_data()
 #         return JSONResponse({
 #             "command": "REQUEST_DATA",
 #             "status": str(status)
@@ -187,5 +212,6 @@ if __name__ == "__main__":
     window.setLayout(layout)
     window.show()
     app.exec()
+    
 
 
