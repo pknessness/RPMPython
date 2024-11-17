@@ -119,7 +119,7 @@ def writeRead(writeString):
         ser.write(writeString.encode('utf-8'))
     except Exception as e:
         return e
-    time.sleep(1)
+    time.sleep(0.05)
     try:
         print("Attempting read from Arduino:")
         by = ser.inWaiting()
