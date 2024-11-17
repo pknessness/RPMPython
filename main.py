@@ -27,7 +27,7 @@ def newFile():
     global filename
     now = datetime.now()
     filename = "logs/log_"+now.strftime("%d-%m-%Y_%H_%M_%S")
-    f = open(filename + ".csv", "w").close()
+    f = open(filename + ".csv", "w+").close()
     
 def writeFile(text):
     f = open(filename + ".csv", "a")
