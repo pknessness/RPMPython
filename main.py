@@ -119,7 +119,7 @@ def writeRead(writeString):
         ser.write(writeString.encode('utf-8'))
     except Exception as e:
         return e
-    time.sleep(0.05)
+    time.sleep(0.15)
     try:
         print("Attempting read from Arduino:")
         by = ser.inWaiting()
@@ -134,13 +134,13 @@ def writeRead(writeString):
 def start(): 
     global status
     if(status == 0):
-        threading.Timer(0.1, request_data).start()
+        threading.Timer(0.2, request_data).start()
+        status = 1
+        response = writeRead("a")
+        newFile()
+        writeFile("accel_x,accel_y,accel_z,encoder_a,encoder_b, t\n")
     else:
         return
-    status = 1
-    response = writeRead("a")
-    newFile()
-    writeFile("accel_x,accel_y,accel_z,encoder_a,encoder_b, t\n")
     if(isinstance(response,Exception)): return response
     return response
 
