@@ -1,0 +1,3 @@
+pip install pyserial
+pip install pyqtgraph
+pip install PyQt6

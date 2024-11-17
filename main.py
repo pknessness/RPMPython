@@ -1,8 +1,10 @@
 #!env/bin/python
 from datetime import datetime, timezone
-#import serial.tools.list_ports
+import serial.tools.list_ports
+from PyQt6.QtWidgets import *
 import serial
 import time
+import platform
 
 # termiosBullshit = 1
 
@@ -63,15 +65,32 @@ def serialInit(block = None):
     ser.setDTR(False)
     
     #ser.writeTimeout = 2     #timeout for write
+    if(len(ports) == 0):
+        scan()
     try:
-        ser.port = "/dev/"+ ports[0]['port']
-        ser.open()
+        for port in ports:
+            if(port['device'] == 'NA'):
+                continue
+            if(platform.system() == "Windows"):
+                ser.port = port['port']
+            else:
+                ser.port = "/dev/"+ port['port']
+            print("initalized ser",ser)
+            ser.open()
     except:
         scan()
         try:
-            ser.port = "/dev/"+ ports[0]['port']
-            ser.open()
+            for port in ports:
+                if(port['device'] == 'NA'):
+                    continue
+                if(platform.system() == "Windows"):
+                    ser.port = port['port']
+                else:
+                    ser.port = "/dev/"+ port['port']
+                print("initalized ser",ser)
+                ser.open()
         except Exception as e:
+            
             return e
     return ser;
     
@@ -83,7 +102,7 @@ def writeRead(writeString):
     if(isinstance(ser,Exception)): return ser;
     
     try:
-        print(f"Attempting write {writeString} from Arduino:")
+        print(f"Attempting write {writeString} from Arduino {ser}:")
         ser.write(writeString.encode('utf-8'))
     except Exception as e:
         return e
@@ -101,25 +120,21 @@ def writeRead(writeString):
     
 def start(): 
     response = writeRead("START;");
-    if(isinstance(response,Exception)): return response;
-    return response;
+    return response
 
 def upload(data):
     #response = writeRead("UPLOAD;");
     #if(isinstance(response,Exception)): return response;
     response = writeRead("UPLOAD; "+ data + ';');
-    if(isinstance(response,Exception)): return response;
-    return response;
+    return response
 
 def stop(): 
-    response = writeRead("STOP;");
-    if(isinstance(response,Exception)): return response;
-    return response;
+    response = writeRead("STOP;")
+    return response
     
 def request_data(): 
-    response = writeRead("REQUEST_DATA;");
-    if(isinstance(response,Exception)): return response;
-    return response;
+    response = writeRead("REQUEST_DATA;")
+    return response
 
 # async def commands(info: Request):
 #     data = await info.json()
@@ -157,12 +172,18 @@ def request_data():
 
 if __name__ == "__main__":
     #uvicorn.run(app, host="127.0.0.1", port=8000)
-    from PyQt6.QtWidgets import *
     app = QApplication([])
     window = QWidget()
     layout = QVBoxLayout()
-    layout.addWidget(QPushButton('Top'))
-    layout.addWidget(QPushButton('Bottom'))
+    
+    startB = QPushButton('Start')
+    stopB = QPushButton('Stop')
+    
+    startB.clicked.connect(start)
+    stopB.clicked.connect(stop)
+    
+    layout.addWidget(startB)
+    layout.addWidget(stopB)
     window.setLayout(layout)
     window.show()
     app.exec()
