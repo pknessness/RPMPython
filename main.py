@@ -115,11 +115,11 @@ def writeRead(writeString):
     if(isinstance(ser,Exception)): return ser
     
     try:
-        print(f"Attempting write {writeString} from Arduino {ser}:")
+        print(f"Attempting write {writeString} from Arduino {ser.port}:")
         ser.write(writeString.encode('utf-8'))
     except Exception as e:
         return e
-    time.sleep(0.15)
+    time.sleep(0.3)
     try:
         print("Attempting read from Arduino:")
         by = ser.inWaiting()
@@ -134,11 +134,11 @@ def writeRead(writeString):
 def start(): 
     global status
     if(status == 0):
-        threading.Timer(0.2, request_data).start()
         status = 1
         response = writeRead("a")
         newFile()
         writeFile("accel_x,accel_y,accel_z,encoder_a,encoder_b, t\n")
+        requestloop()
     else:
         return
     if(isinstance(response,Exception)): return response
@@ -164,6 +164,12 @@ def request_data():
         except:
             print(text, "is a wierd output")
     return response
+
+def requestloop():
+    if(status == 0):
+        return
+    request_data()
+    threading.Timer(0.5, requestloop).start()
 
 # async def commands(info: Request):
 #     data = await info.json()
