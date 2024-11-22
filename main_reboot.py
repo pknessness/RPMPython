@@ -117,10 +117,12 @@ def writeRead(writeString):
     
     response = None
     
-    if(isinstance(serialDevice,Exception)): return serialDevice
+    if(isinstance(serialDevice,Exception)): 
+        print("NO SERIAL DEVICE")
+        return serialDevice
     
     try:
-        print(f"Attempting write {writeString} from Arduino {ser.port}:")
+        print(f"Attempting write {writeString} from Arduino {serialDevice.port}:")
         serialDevice.write(writeString.encode('utf-8'))
     except Exception as e:
         return e
@@ -139,6 +141,7 @@ def start():
     global status
     if(status == 0):
         status = 1
+        print("STARTING RUN")
         response = writeRead("a")
         newFile()
         writeFile("accel_x,accel_y,accel_z,encoder_a,encoder_b, t\n")
@@ -157,6 +160,7 @@ def stop():
     return response
     
 def request_data(): 
+    print("REQUESTING DATA")
     response = writeRead("d")
     if(isinstance(response,Exception)):
         writeFile(str(response)+"\n")
@@ -164,10 +168,12 @@ def request_data():
     else:
         text = response.replace("+","").replace("#","").replace("==","=")
         values = text.split("=")
+        print("RECIEVED DATA: "+ text)
         try:
             writeFile(f"{values[0]},{values[1]},{values[2]},{values[3]},{values[4]},{datetime.utcnow()}\n")
         except:
             print(text, "is a wierd output")
+            serialDevice.close()
             serialDevice = None
     return response
 
