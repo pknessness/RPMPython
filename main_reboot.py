@@ -23,6 +23,8 @@ status = 0
 
 filename = "NO_PROFILE"
 
+serialDevice = None
+
 def newFile():
     global filename
     now = datetime.now()
@@ -105,30 +107,32 @@ def serialInit(block = None):
         except Exception as e:
             
             return e
+    time.sleep(2)
     return ser
     
 def writeRead(writeString):
-    ser = serialInit(1)
+    global serialDevice
+    if(serialDevice == None):
+        serialDevice = serialInit(1)
     
     response = None
     
-    if(isinstance(ser,Exception)): return ser
+    if(isinstance(serialDevice,Exception)): return serialDevice
     
     try:
         print(f"Attempting write {writeString} from Arduino {ser.port}:")
-        ser.write(writeString.encode('utf-8'))
+        serialDevice.write(writeString.encode('utf-8'))
     except Exception as e:
         return e
     time.sleep(0.3)
     try:
         print("Attempting read from Arduino:")
-        by = ser.inWaiting()
-        response = ser.read(by).decode('utf-8')
+        by = serialDevice.inWaiting()
+        response = serialDevice.read(by).decode('utf-8')
         print(by, response)
     except Exception as e:
         return e
     
-    ser.close()
     return response
     
 def start(): 
@@ -145,6 +149,7 @@ def start():
     return response
 
 def stop(): 
+    global serialDevice
     status = 0
     response = writeRead("r")
     filename = "NO_PROFILE"
@@ -163,6 +168,7 @@ def request_data():
             writeFile(f"{values[0]},{values[1]},{values[2]},{values[3]},{values[4]},{datetime.utcnow()}\n")
         except:
             print(text, "is a wierd output")
+            serialDevice = None
     return response
 
 def requestloop():
