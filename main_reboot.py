@@ -166,6 +166,7 @@ def request_data():
         writeFile(str(response)+"\n")
         return response
     else:
+        global serialDevice
         text = response.replace("+","").replace("#","").replace("==","=")
         values = text.split("=")
         print("RECIEVED DATA: "+ text)
